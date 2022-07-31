@@ -29,7 +29,9 @@ def crawl():
     surgeon_search_results = []
     for surgeon in surgeon_list:
         yield runner.crawl(ProviderSpider, surgeon=surgeon, city=current_city)
+        print('FINISHED PROVIDER')
         yield runner.crawl(PracticesSpider, surgeon=surgeon)
+        print('FINISHED PRACTICE')
         surgeon_search_results.append(surgeon)
     reactor.stop()
     print('reactor stop')

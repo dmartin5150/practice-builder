@@ -26,6 +26,8 @@ class PracticesSpider(scrapy.Spider):
                     screenshot=True,
                     callback=self.parse
                 )
+            else:
+                self.surgeon.add_practice(Practice())
             
 
     def parse(self, response):
@@ -46,10 +48,10 @@ class PracticesSpider(scrapy.Spider):
         for location in locations:
             practice_name = location.xpath(".//div[@class='location-practice-name webmd-row']/a/text()").get()
             practice_link = location.xpath(".//div[@class='location-practice-name webmd-row']/a/@href").get()
-            practice_address = location.xpath(".//div[@class='location-address webmd-row']/text()").get()
-            practice_city = location.xpath(".//div[@class='location-geo webmd-row']/span[@class='location-city']/text()").get()
-            practice_state = location.xpath(".//div[@class='location-geo webmd-row']/span[@class='location-state']/text()").get()
-            practice_zip = location.xpath(".//div[@class='location-geo webmd-row']/span[@class='location-zipcode']/text()").get()
+            practice_address = location.xpath(".//div[@class='location-address loc-coi-locad webmd-row']/text()").get()
+            practice_city = location.xpath(".//div[@class='location-geo webmd-row']/span[@class='location-city loc-coi-loccty']/text()").get()
+            practice_state = location.xpath(".//div[@class='location-geo webmd-row']/span[@class='location-state loc-coi-locsta']/text()").get()
+            practice_zip = location.xpath(".//div[@class='location-geo webmd-row']/span[@class='location-zipcode loc-coi-loczip']/text()").get()
             practice_phone = location.xpath(".//div[@class='location-phone webmd-row']/a/text()").get()
             current_practice = Practice(practice_name,practice_address,practice_city,practice_state,practice_zip,practice_phone,practice_link)
             self.surgeon.add_practice(current_practice)
