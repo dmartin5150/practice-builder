@@ -1,5 +1,5 @@
 class Practice:
-    def __init__ (self,name, address,city,state,zip,phone,link):
+    def __init__ (self,name='Not Found', address ='',city='',state='',zip='',phone='',link=''):
         self.name = name
         self.address = address
         self.city = city

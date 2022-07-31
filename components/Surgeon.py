@@ -14,7 +14,7 @@ class Surgeon:
         self.practices = []
 
     def __repr__(self):
-        print(f'name: {self.name}')
+        return (f'name: {self.name}')
 
     def get_name(self):
         return self.name
@@ -28,6 +28,9 @@ class Surgeon:
     
     def set_webmd_link(self,link):
         self.webmd_link = link
+    
+    def get_webmd_link(self):
+        return self.webmd_link
 
     def add_specialty(self,specialty):
         self.specialites.append(specialty)
@@ -37,5 +40,8 @@ class Surgeon:
 
     def get_practices(self):
         return self.practices
+
+    def get_ministry(self):
+        return self.ministry
 
 
