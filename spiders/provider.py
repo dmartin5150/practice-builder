@@ -4,6 +4,8 @@ from scrapy.selector import Selector
 from components.Surgeon import Surgeon
 from components.Practice import Practice 
 from util.utilities import get_url, get_location_url
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 
 
@@ -23,7 +25,7 @@ class ProviderSpider(scrapy.Spider):
     def start_requests(self):
         yield SeleniumRequest(
             url=self.url, 
-            wait_time=5,
+            wait_until= EC.element_to_be_clickable((By.XPATH, "//ul[@class='resultslist-content']")),
             screenshot=True,
             callback=self.get_webmd_link
         )
@@ -31,11 +33,11 @@ class ProviderSpider(scrapy.Spider):
 
     def get_webmd_link(self, response):
 
-        # img = response.meta['screenshot']
-        # print('response', response.url)
-        # with open('screenshot.png','wb') as f:
-        #     f.write(img)
-
+        img = response.meta['screenshot']
+        print('response', response.url)
+        with open('screenshot.png','wb') as f:
+            f.write(img)
+        print('in webmd_link')
         surgeons_from_initial_search = response.xpath("//div[@class='prov-name-wrap']/a")
         found = False
         for surgeon in surgeons_from_initial_search:
@@ -54,6 +56,11 @@ class ProviderSpider(scrapy.Spider):
         if not found:
             self.surgeon.set_webmd_link=''
             self.surgeon.set_webmd_name ='Not found'
+            self.search_results.append(self.surgeon)
+        print('done web link')
+        yield {
+            'surgeon': self.surgeon.name
+        }
 
             
 
