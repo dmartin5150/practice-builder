@@ -1,9 +1,6 @@
 import scrapy
 from scrapy_selenium import SeleniumRequest
-from scrapy.selector import Selector
-from components.Surgeon import Surgeon
 from components.Practice import Practice 
-from util.utilities import get_url, get_location_url
 
 
 
@@ -53,6 +50,7 @@ class PracticesSpider(scrapy.Spider):
             practice_state = location.xpath(".//div[@class='location-geo webmd-row']/span[@class='location-state loc-coi-locsta']/text()").get()
             practice_zip = location.xpath(".//div[@class='location-geo webmd-row']/span[@class='location-zipcode loc-coi-loczip']/text()").get()
             practice_phone = location.xpath(".//div[@class='location-phone webmd-row']/a/text()").get()
+            print(f'state: {practice_state}')
             current_practice = Practice(practice_name,practice_address,practice_city,practice_state,practice_zip,practice_phone,practice_link)
             self.surgeon.add_practice(current_practice)
             print('adding practice')

@@ -44,4 +44,9 @@ class Surgeon:
     def get_ministry(self):
         return self.ministry
 
+    def get_specialties(self):
+        return ' '.join(self.specialites)
+    
+    def set_webmd_name(self,name):
+        self.webmd_name = name
 

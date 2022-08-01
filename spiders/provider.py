@@ -44,11 +44,13 @@ class ProviderSpider(scrapy.Spider):
                 print(f"Matched surgeon Ascension name:{self.surgeon.get_name()} webmd name: {surgeon_name}" )
                 webmd_link = get_location_url(surgeon.xpath('.//@href').get())
                 self.surgeon.set_webmd_link(webmd_link)
+                self.surgeon.set_webmd_name(surgeon_name)
                 self.surgeon = Surgeon(self.surgeon.get_name(), self.surgeon.get_ministry())
             else:
                 print(f"No match Ascension name:{self.surgeon.get_name()} webmd name: {surgeon_name}" )
         if not found:
             self.surgeon.set_webmd_link=''
+            self.surgeon.set_webmd_name ='Not found'
 
             
 
