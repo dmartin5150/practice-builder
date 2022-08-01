@@ -3,13 +3,26 @@ from components.City import City
 
 
 
+def reformat_ascnesion_name(name):
+    name = re.sub('III','', name)
+    name = re.sub('II','', name)
+    name = re.sub('(JR.)','',name)
+    name = re.sub('\'', "", name)
+    m = re.match("^\s*\w*,", name)
+
+    if m:
+        span = m.span()[1]
+    lastname = name[:span-1]
+    firstname = name[span+1:]
+    return firstname.strip() + ' ' + lastname.strip()
+    
 
 
 def reformat_name(name):
+    name = re.sub('III','', name)
+    name = re.sub('JR.','',name)
     name = re.sub('(\w+\.)','',name)
     name = re.sub('(\,\s*\w+)','',name)
-    name = re.sub('(III)','', name)
-    name = re.sub('(JR.)','',name)
     return name.strip().upper().split(' ')
 
 

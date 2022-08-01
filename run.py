@@ -5,6 +5,7 @@ from spiders.practices import PracticesSpider
 from scrapy.utils.project import get_project_settings
 from components.Surgeon import Surgeon
 from components.City import City
+from util.utilities import reformat_ascnesion_name
 import pandas as pd
 
 
@@ -35,29 +36,33 @@ def crawl():
     reactor.stop()
     print('reactor stop')
 
+name = "O'BRIEN, BRIDGET ANNE"
+reformat = reformat_ascnesion_name(name)
+print('reformat', reformat)
 
-crawl()
-print('starting reactor')
-reactor.run()
+
+# crawl()
+# print('starting reactor')
+# reactor.run()
 
 
-print('Finished')
-columns = ['Ascension_Name', 'Webmd_Name', 'Webmd_Link', 'Ministry', 'Specialty',
-           'NPI', 'Clinic_Name', 'Address', 'City', 'State', 'Zip', 'Phone', 'Practice_Link']
-surgeon_data = pd.DataFrame(columns=columns)
-for surgeon in surgeon_list:
-    practices = surgeon.get_practices()
-    for practice in practices:
-        surgeon_row = pd.DataFrame([{'Ascension_Name': surgeon.name, 'Webmd_Name': surgeon.webmd_name,
-                                     'Ministry': surgeon.ministry, 'Specialty': surgeon.get_specialties(),
-                                     'NPI': surgeon.npi, 'Webmd_Link': surgeon.webmd_link, 'Clinic_Name': practice.name,
-                                     'Clinic_Name': practice.name, 'Address': practice.address, 'City': practice.city,
-                                     'State': practice.state, 'Zip': practice.zip, 'Phone': practice.phone, 'Practice_Link': practice.website}])
-        print(surgeon_row)
-        surgeon_data = pd.concat(
-            (surgeon_data, surgeon_row), ignore_index=True, axis=0)
+# print('Finished')
+# columns = ['Ascension_Name', 'Webmd_Name', 'Webmd_Link', 'Ministry', 'Specialty',
+#            'NPI', 'Clinic_Name', 'Address', 'City', 'State', 'Zip', 'Phone', 'Practice_Link']
+# surgeon_data = pd.DataFrame(columns=columns)
+# for surgeon in surgeon_list:
+#     practices = surgeon.get_practices()
+#     for practice in practices:
+#         surgeon_row = pd.DataFrame([{'Ascension_Name': surgeon.name, 'Webmd_Name': surgeon.webmd_name,
+#                                      'Ministry': surgeon.ministry, 'Specialty': surgeon.get_specialties(),
+#                                      'NPI': surgeon.npi, 'Webmd_Link': surgeon.webmd_link, 'Clinic_Name': practice.name,
+#                                      'Clinic_Name': practice.name, 'Address': practice.address, 'City': practice.city,
+#                                      'State': practice.state, 'Zip': practice.zip, 'Phone': practice.phone, 'Practice_Link': practice.website}])
+#         print(surgeon_row)
+#         surgeon_data = pd.concat(
+#             (surgeon_data, surgeon_row), ignore_index=True, axis=0)
 
-surgeon_data.to_csv('data.csv')
+# surgeon_data.to_csv('data.csv')
 
 
 # surgeon_search_results = []
