@@ -20,8 +20,8 @@ class Surgeon:
         return self.name
 
     def compare_name(self, name):
-        ascension = reformat_name(self.name)
-        web_md = reformat_name(name)
+        ascension = reformat_name(self.name.upper())
+        web_md = reformat_name(name.upper())
         if ascension[0] == web_md[0] and ascension[-1] == web_md[-1]:
             return True
         return False

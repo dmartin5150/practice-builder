@@ -3,7 +3,7 @@ from components.City import City
 
 
 
-def reformat_ascnesion_name(name):
+def reformat_ascension_name(name):
     name = re.sub('III','', name)
     name = re.sub('II','', name)
     name = re.sub('(JR.)','',name)
@@ -21,6 +21,7 @@ def reformat_ascnesion_name(name):
 def reformat_name(name):
     name = re.sub('III','', name)
     name = re.sub('JR.','',name)
+    name = re.sub('(^\s*MD\s+)','',name)
     name = re.sub('(\w+\.)','',name)
     name = re.sub('(\,\s*\w+)','',name)
     return name.strip().upper().split(' ')

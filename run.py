@@ -6,20 +6,32 @@ from spiders.practices import PracticesSpider
 from scrapy.utils.project import get_project_settings
 from components.Surgeon import Surgeon
 from components.City import City
-from util.utilities import reformat_ascnesion_name
+from util.utilities import reformat_ascension_name
 import pandas as pd
 
 
-austin_coordinates = ('36.1658', '-86.7844')
-current_city = City('Nashville', 'TN', austin_coordinates)
-surgeon1 = Surgeon('Gregory Raab, MD', 'TNNAS')
-surgeon2 = Surgeon('William Kurtz, MD', 'TNNAS')
-surgeon3 = Surgeon('Test', 'TNNAS')
+austin_coordinates = ('30.3024', '-97.7619')
+current_city = City('Austin', 'TX', austin_coordinates)
+
+
+
+
+
+
+def create_loaded_list(filename):
+    loaded_list = []
+    list_of_surgeons = pd.read_csv(filename)
+    npi_dict = dict(zip(list_of_surgeons.Surgeon,list_of_surgeons.NPI))
+    for key in npi_dict:
+        surgeon = Surgeon(reformat_ascension_name(key), 'TXAUS',npi_dict[key])
+        loaded_list.append(surgeon)
+    return loaded_list
+
+
 surgeon_loaded_list = []
-surgeon_loaded_list.append(surgeon1)
-surgeon_loaded_list.append(surgeon2)
-surgeon_loaded_list.append(surgeon3)
+surgeon_loaded_list = create_loaded_list("test_list - Sheet1.csv")
 surgeon_final_list = []
+
 
 settings = get_project_settings()
 runner = CrawlerRunner(settings)
@@ -33,6 +45,7 @@ def tranfer_surgeons_to_final_list(search_results):
 @defer.inlineCallbacks
 def crawl():
     surgeon_search_results = []
+    i=1
     for surgeon in surgeon_loaded_list:
         yield runner.crawl(ProviderSpider, surgeon=surgeon, city=current_city, search_results=surgeon_search_results)
         # print('FINISHED PROVIDER')
@@ -41,6 +54,8 @@ def crawl():
             tranfer_surgeons_to_final_list(surgeon_search_results)
         surgeon_search_results=[]   
             # print('FINISHED PRACTICE')
+        print(f'Processing surgeon {surgeon.name} number: {i}')
+        i=i+1
     reactor.stop()
     print('reactor stop')
 
