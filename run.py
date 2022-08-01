@@ -43,7 +43,7 @@ def create_loaded_list(filename):
 
 
 surgeon_loaded_list = []
-surgeon_loaded_list = create_loaded_list("test1 - Sheet1.csv")
+surgeon_loaded_list = create_loaded_list("test_list2 - Sheet1.csv")
 surgeon_final_list = []
 print(surgeon_loaded_list)
 
@@ -52,12 +52,13 @@ runner = CrawlerRunner(settings)
 
 
 
-def tranfer_surgeons_to_final_list(search_results):
-    for surgeon in search_results:
-        surgeon_final_list.append(surgeon)
 
 url_html_dict = {}
 url_surgeon_dict = {}
+practices_start_url = []
+url_surgeon_locationlink = {}
+
+
 start_urls = []
 
 
@@ -67,6 +68,17 @@ def get_provider_start_urls(url_html_dict):
         urls.append(key)
     return urls
 
+def get_practices_start_urls():
+    urls = []
+    for surgeon in surgeon_final_list:
+        urls.append(surgeon.webmd_link)
+    return urls
+
+def get_surgeon_location_dict():
+    sur_loc_dict ={}
+    for surgeon in surgeon_final_list:
+        sur_loc_dict[surgeon.webmd_link] = surgeon
+    return sur_loc_dict
 
 for surgeon in surgeon_loaded_list:
     print('surgeon: ', surgeon)
@@ -89,7 +101,11 @@ runner = CrawlerRunner()
 @defer.inlineCallbacks
 def crawl():
     yield runner.crawl(Provider2Spider,urls=start_urls,html=url_html_dict,surgeons=url_surgeon_dict, search_results=surgeon_final_list)
-    # yield runner.crawl(MySpider2)
+    print('finised with provider')
+    practices_start_url = get_practices_start_urls()
+    url_surgeon_locationlink = get_surgeon_location_dict()
+    print('practice_start_urls ',)
+    yield runner.crawl(PracticesSpider,urls=practices_start_url,surgeons=url_surgeon_locationlink)
     reactor.stop()
     for surgeon in surgeon_final_list:
         print(f'Surgeon: {surgeon.name} Link: {surgeon.webmd_link}')
@@ -103,22 +119,22 @@ reactor.run()
 
 
 
-# print('Finished')
-# columns = ['Ascension_Name', 'Webmd_Name', 'Webmd_Link', 'Ministry', 'Specialty',
-#            'NPI', 'Clinic_Name', 'Address', 'City', 'State', 'Zip', 'Phone', 'Practice_Link']
-# surgeon_data = pd.DataFrame(columns=columns)
-# for surgeon in surgeon_final_list:
-#     practices = surgeon.get_practices()
-#     for practice in practices:
-#         surgeon_row = pd.DataFrame([{'Ascension_Name': surgeon.name, 'Webmd_Name': surgeon.webmd_name,
-#                                      'Ministry': surgeon.ministry, 'Specialty': surgeon.get_specialties(),
-#                                      'NPI': surgeon.npi, 'Webmd_Link': surgeon.webmd_link, 'Clinic_Name': practice.name,
-#                                      'Clinic_Name': practice.name, 'Address': practice.address, 'City': practice.city,
-#                                      'State': practice.state, 'Zip': practice.zip, 'Phone': practice.phone, 'Practice_Link': practice.website}])
-#         surgeon_data = pd.concat(
-#             (surgeon_data, surgeon_row), ignore_index=True, axis=0)
+print('Finished')
+columns = ['Ascension_Name', 'Webmd_Name', 'Webmd_Link', 'Ministry', 'Specialty',
+           'NPI', 'Clinic_Name', 'Address', 'City', 'State', 'Zip', 'Phone', 'Practice_Link']
+surgeon_data = pd.DataFrame(columns=columns)
+for surgeon in surgeon_final_list:
+    practices = surgeon.get_practices()
+    for practice in practices:
+        surgeon_row = pd.DataFrame([{'Ascension_Name': surgeon.name, 'Webmd_Name': surgeon.webmd_name,
+                                     'Ministry': surgeon.ministry, 'Specialty': surgeon.get_specialties(),
+                                     'NPI': surgeon.npi, 'Webmd_Link': surgeon.webmd_link, 'Clinic_Name': practice.name,
+                                     'Clinic_Name': practice.name, 'Address': practice.address, 'City': practice.city,
+                                     'State': practice.state, 'Zip': practice.zip, 'Phone': practice.phone, 'Practice_Link': practice.website}])
+        surgeon_data = pd.concat(
+            (surgeon_data, surgeon_row), ignore_index=True, axis=0)
 
-# surgeon_data.to_csv('data.csv')
+surgeon_data.to_csv('data.csv')
 
 
 

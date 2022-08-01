@@ -11,20 +11,8 @@ class PracticesSpider(scrapy.Spider):
     
     def __init__(self, *args, **kwargs):
         super(PracticesSpider, self).__init__(*args, **kwargs)
-        self.surgeon = kwargs.get('surgeon')
-
-
-    def start_requests(self):
-            url = self.surgeon.get_webmd_link()
-            if url != '':
-                yield SeleniumRequest(
-                    url=url, 
-                    wait_time=5,
-                    screenshot=True,
-                    callback=self.parse
-                )
-            else:
-                self.surgeon.add_practice(Practice())
+        self.surgeons = kwargs.get('surgeons')
+        self.start_urls = kwargs.get("urls")
             
 
     def parse(self, response):
@@ -34,13 +22,15 @@ class PracticesSpider(scrapy.Spider):
      
 
     def add_specialties(self, response):
+        listed_surgeon= self.surgeons[response.url]
         specialties = response.xpath("//div[@class='prov-specialties-wrap']/span[@class='prov-specialty-name']")
         for specialty in specialties:
             specialty_name = specialty.xpath('.//text()').get()
-            self.surgeon.add_specialty(specialty_name)
+            listed_surgeon.add_specialty(specialty_name)
 
 
     def add_practices(self,response):
+        listed_surgeon= self.surgeons[response.url]
         locations = response.xpath("//div[@class='loc-1 webmd-col webmd-col-24 webmd-col-xs-24 webmd-col-sm-24 webmd-col-md-24 webmd-col-lg-15 webmd-col-xl-15']")
         for location in locations:
             practice_name = location.xpath(".//div[@class='location-practice-name webmd-row']/a/text()").get()
@@ -52,7 +42,7 @@ class PracticesSpider(scrapy.Spider):
             practice_phone = location.xpath(".//div[@class='location-phone webmd-row']/a/text()").get()
             print(f'state: {practice_state}')
             current_practice = Practice(practice_name,practice_address,practice_city,practice_state,practice_zip,practice_phone,practice_link)
-            self.surgeon.add_practice(current_practice)
+            listed_surgeon.add_practice(current_practice)
             print('adding practice')
 
 
