@@ -43,11 +43,12 @@ def create_loaded_list(filename):
 
 
 surgeon_loaded_list = []
-surgeon_loaded_list = create_loaded_list("SMCA300 - Sheet1.csv")
+surgeon_loaded_list = create_loaded_list("SMCA500 - Sheet1.csv")
 surgeon_final_list = []
 print(surgeon_loaded_list)
 
 settings = get_project_settings()
+
 runner = CrawlerRunner(settings)
 
 
