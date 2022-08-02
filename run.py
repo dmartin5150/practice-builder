@@ -43,7 +43,7 @@ def create_loaded_list(filename):
 
 
 surgeon_loaded_list = []
-surgeon_loaded_list = create_loaded_list("test_list2 - Sheet1.csv")
+surgeon_loaded_list = create_loaded_list("SMCA300 - Sheet1.csv")
 surgeon_final_list = []
 print(surgeon_loaded_list)
 
@@ -71,7 +71,8 @@ def get_provider_start_urls(url_html_dict):
 def get_practices_start_urls():
     urls = []
     for surgeon in surgeon_final_list:
-        urls.append(surgeon.webmd_link)
+        if surgeon.webmd_link != '':
+            urls.append(surgeon.webmd_link)
     return urls
 
 def get_surgeon_location_dict():
@@ -80,8 +81,9 @@ def get_surgeon_location_dict():
         sur_loc_dict[surgeon.webmd_link] = surgeon
     return sur_loc_dict
 
+i=1
 for surgeon in surgeon_loaded_list:
-    print('surgeon: ', surgeon)
+    print('surgeon: ', surgeon, "count:", i)
     url = get_url(surgeon.get_name(),current_city)
     url_surgeon_dict[url] = surgeon
     driver = webdriver.Chrome(executable_path=chrome_path, options=chrome_options)
@@ -90,8 +92,8 @@ for surgeon in surgeon_loaded_list:
     html = driver.page_source
     driver.close()
     url_html_dict[url] = html 
-    start_urls= get_provider_start_urls(url_html_dict)
-    print(start_urls)
+    i=i+1
+
 
 
 
@@ -100,13 +102,15 @@ runner = CrawlerRunner()
 
 @defer.inlineCallbacks
 def crawl():
+    start_urls= get_provider_start_urls(url_html_dict)
     yield runner.crawl(Provider2Spider,urls=start_urls,html=url_html_dict,surgeons=url_surgeon_dict, search_results=surgeon_final_list)
     print('finised with provider')
     practices_start_url = get_practices_start_urls()
     url_surgeon_locationlink = get_surgeon_location_dict()
-    print('practice_start_urls ',)
+    print('practice_start_urls ', len(practices_start_url))
     yield runner.crawl(PracticesSpider,urls=practices_start_url,surgeons=url_surgeon_locationlink)
     reactor.stop()
+    print(f'Final Surgeons {len(surgeon_final_list)}')
     for surgeon in surgeon_final_list:
         print(f'Surgeon: {surgeon.name} Link: {surgeon.webmd_link}')
 
