@@ -9,7 +9,7 @@ def reformat_ascension_name(name):
     name = re.sub('(JR.)','',name)
     name = re.sub('\'', "", name)
     m = re.match("^(\s*\w*\-*)+,", name)
-    print(name)
+    # print(name)
     if m:
         span = m.span()[1]
     lastname = name[:span-1]

@@ -2,12 +2,20 @@ from components.GenertatedPractice import Generated_Practice
 import pandas as pd
 import numpy as np
 import os
+from util.utilities import reformat_ascension_name
+
 
 data1 = pd.read_csv('data1.csv')
 data2 = pd.read_csv('data2.csv')
 data3 = pd.read_csv('data3.csv')
 data4 = pd.read_csv('data4.csv')
 data5 = pd.read_csv('data5.csv')
+originial_list = pd.read_csv('ASMCA Surgeon List - ASMCA Surgeon List - 24 Months.csv')
+headers = originial_list.iloc[1]
+originial_list  = pd.DataFrame(originial_list.values[2:], columns=headers)
+# case_volumes = originial_list[['Surgeon','Surgeon Case Volume']].rename(columns={'Surgeon': 'Ascension_Name'})
+case_volumes = originial_list[['Surgeon','Surgeon Case Volume']].rename(columns={'Surgeon': 'Ascension_Name'})
+# print('case_volumes', case_volumes)
 final_data = pd.concat(
             (data1, data2), ignore_index=True, axis=0)
 final_data = pd.concat(
@@ -16,17 +24,17 @@ final_data = pd.concat(
             (final_data, data4), ignore_index=True, axis=0)
 final_data = pd.concat(
             (final_data, data5), ignore_index=True, axis=0)
+print(final_data.columns)
+case_volumes['Ascension_Name'] = case_volumes['Ascension_Name'].apply(lambda x: reformat_ascension_name(x) )
+final_data = final_data.merge(case_volumes, left_on='Ascension_Name', right_on='Ascension_Name',how='right')
 
+# print(data_with_case_volumes.columns)
 final_data['Clinic_Name'].fillna(final_data['Ascension_Name'] +"'S CLINIC", inplace=True)
 final_data['Clinic_Name'] = final_data['Clinic_Name'].apply(lambda x:x.strip().upper())
 final_data['Ascension_Name'] = final_data['Ascension_Name'].apply(lambda x:x.strip().upper())
+print('test2')
 
 
-
-# final_data.to_csv("SMCA_clinic_data.csv")
-# unique_surgeons = final_data['Ascension_Name'].unique()
-# print(final_data.columns)
-# final_data.to_csv('SMCA_clinic_info.csv')
 
 def update_clinic_list(practice, clinic_list):
     new_list = []
@@ -45,12 +53,12 @@ while len(working_clinic_list) > 0:
     cur_clinic = working_clinic_list[0]
     practice = Generated_Practice(f'{cur_clinic} Practice',final_data)
     cur_clinic = working_clinic_list[0]
-    print(cur_clinic)
+    # print(cur_clinic)
     practice.generate_practice_data(cur_clinic)
     practice_list.append(practice)
     matched_clinics.append(practice.new_clinics)
     working_clinic_list = update_clinic_list(practice, working_clinic_list)
-    print(len(working_clinic_list))
+    # print(len(working_clinic_list))
     i=i+1
 
 
@@ -76,7 +84,7 @@ def write_practice_clinics_excel_worksheet(writer,practice_list, full_dataframe,
         print ('Error')
 
 def write_practice_clinics_surgeons_excel_worksheet(writer,practice_list, full_dataframe, worksheet_name='surgeons') :
-    columns = ['Clinic_Name','Ascension_Name', 'Specialty', 'Webmd_Link']
+    columns = ['Clinic_Name','Ascension_Name', 'Specialty','Surgeon Case Volume', 'Webmd_Link']
     all_data = pd.DataFrame(columns= columns)
     blank_row = pd.DataFrame(columns=columns)
     current_clinic_name = pd.DataFrame(columns=columns)
@@ -89,7 +97,7 @@ def write_practice_clinics_surgeons_excel_worksheet(writer,practice_list, full_d
         all_data = pd.concat((all_data, current_practice_name),ignore_index=True, axis=0)
         for clinic_name in clinic_names:
             current_clinic_name.loc[0,0]='Clinic: ' + clinic_name
-            surgeons = full_dataframe[full_dataframe['Clinic_Name']== clinic_name][columns]
+            surgeons = full_dataframe[full_dataframe['Clinic_Name']== clinic_name][columns].drop_duplicates()
             surgeons['Clinic_Name'] = ''
             all_data = pd.concat((all_data, current_clinic_name),ignore_index=True, axis=0)
             all_data = pd.concat((all_data, surgeons),ignore_index=True, axis=0)
