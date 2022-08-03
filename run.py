@@ -43,7 +43,7 @@ def create_loaded_list(filename):
 
 
 surgeon_loaded_list = []
-surgeon_loaded_list = create_loaded_list("SMCA500 - Sheet1.csv")
+surgeon_loaded_list = create_loaded_list("SMCA100 - Sheet1.csv")
 surgeon_final_list = []
 print(surgeon_loaded_list)
 
